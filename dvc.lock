@@ -1,0 +1,42 @@
+schema: '2.0'
+stages:
+  data_cleaning:
+    cmd: python ./src/data/content_filtering_data_cleaning.py
+    deps:
+    - path: ./data/raw/Music Info.csv
+      hash: md5
+      md5: e63b74919a3cdada5c804df4666391c9
+      size: 14985870
+    - path: ./src/data/content_filtering_data_cleaning.py
+      hash: md5
+      md5: 35e1413eb9f3dbea79fe4f3b121a8369
+      size: 3376
+    outs:
+    - path: ./data/cleaned/df_songs_cleaned.csv
+      hash: md5
+      md5: b5e99f8fcf0e54fa347c97490c779d67
+      size: 13709636
+  data_transformation:
+    cmd: python ./src/data/content_filtering_data_transformation.py
+    deps:
+    - path: ./data/cleaned/df_songs_cleaned.csv
+      hash: md5
+      md5: b5e99f8fcf0e54fa347c97490c779d67
+      size: 13709636
+    - path: ./src/data/content_filtering_data_cleaning.py
+      hash: md5
+      md5: 35e1413eb9f3dbea79fe4f3b121a8369
+      size: 3376
+    - path: ./src/data/content_filtering_data_transformation.py
+      hash: md5
+      md5: 65dfd61bfc913431cb8e0aa8fa9022bd
+      size: 7808
+    outs:
+    - path: ./data/processed/content_filtering_transformed_data.npz
+      hash: md5
+      md5: f32fa1890a52bed4fe44aaac84bf5815
+      size: 4522794
+    - path: ./models/transformer.joblib
+      hash: md5
+      md5: fc47bd9481bf8143d3bd0b37d4187874
+      size: 135629

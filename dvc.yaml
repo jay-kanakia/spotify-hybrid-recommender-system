@@ -1,0 +1,17 @@
+stages:
+  data_cleaning:
+    cmd: python ./src/data/content_filtering_data_cleaning.py
+    deps:
+    - ./data/raw/Music Info.csv
+    - ./src/data/content_filtering_data_cleaning.py
+    outs:
+    - ./data/cleaned/df_songs_cleaned.csv
+  data_transformation:
+    cmd: python ./src/data/content_filtering_data_transformation.py
+    deps:
+    - ./data/cleaned/df_songs_cleaned.csv
+    - ./src/data/content_filtering_data_cleaning.py
+    - ./src/data/content_filtering_data_transformation.py
+    outs:
+    - ./data/processed/content_filtering_transformed_data.npz
+    - ./models/transformer.joblib
