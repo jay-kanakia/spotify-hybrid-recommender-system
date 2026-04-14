@@ -8,7 +8,7 @@ from category_encoders.count import CountEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-from content_filtering_data_cleaning import data_for_content_filtering
+from .content_filtering_data_cleaning import data_for_content_filtering
 from scipy.sparse import save_npz
 from pathlib import Path
 from typing import Optional
@@ -131,14 +131,13 @@ def calculate_similarity_score(input_vector:np.array,transformed_data:pd.DataFra
 
     return similarity_score
 
-def content_recommendation(song_name:str,artist_name:str,songs_data:pd.DataFrame,transformed_data:np.array,k:Optional[int]=10)->pd.DataFrame:
+def content_recommendation(song_name:str,songs_data:pd.DataFrame,transformed_data:np.array,k:Optional[int]=10)->pd.DataFrame:
 
     """
     Recommends top k songs similar to the given song based on content-based filtering.
 
     Parameters:
     song_name (str): The name of the song to base the recommendations on.
-    artist_name (str): The name of the artist of the song.
     songs_data (DataFrame): The DataFrame containing song information.
     transformed_data (ndarray): The transformed data matrix for similarity calculations.
     k (int, optional): The number of similar songs to recommend. Default is 10.
@@ -149,18 +148,15 @@ def content_recommendation(song_name:str,artist_name:str,songs_data:pd.DataFrame
 
     # convert song name to lowercase
     song_name = song_name.lower()
-    
-    # convert the artist name to lowercase
-    artist_name = artist_name.lower()
 
     # filter out the song from data
-    song_row = songs_data.loc[((songs_data['name'] == song_name) & (songs_data['artist'] == artist_name)) ]
+    song_row = songs_data[((songs_data['name'] == song_name))]
 
     # get the index of song
     song_index = song_row.index[0]
 
     # generate the input vector
-    input_vector = transformed_data.loc[song_index]
+    input_vector = transformed_data[song_index]
 
     # calculate similarity scores
     similarity_score = cosine_similarity(input_vector,transformed_data  )
@@ -172,11 +168,11 @@ def content_recommendation(song_name:str,artist_name:str,songs_data:pd.DataFrame
     top_k_songs_names = songs_data.iloc[top_k_songs_indexes]
 
     # print the top k songs
-    top_k_list = top_k_songs_names[['name','artist','spotify_preview_url']].reset_index(drop=True)
+    top_k_df = top_k_songs_names[['name','artist','spotify_preview_url']].reset_index(drop=True)
     
-    return top_k_list
+    return top_k_df
 
-def main():
+def main(song_name:str,k:Optional[int]=10):
     """
     Test the recommendations for a given song using content-based filtering.
 
@@ -231,5 +227,15 @@ def main():
     save_transformed_data(transformed_data,trans_path)
     logger.info("Data saved successfully")
 
+    # get top k songs
+    top_k_df = content_recommendation(song_name,df,transformed_data)
+
+    # print top k songs
+    print(f"The recommendation for song {song_name} are \n {top_k_df}")
+
+
 if __name__ == "__main__":
-    main()
+
+    song_name = "Hips Don't Lie"
+    
+    main(song_name=song_name)
