@@ -1,2 +1,3 @@
 /content_filtering_transformed_data.csv
 /content_filtering_transformed_data.npz
+/interaction_matrix.npz

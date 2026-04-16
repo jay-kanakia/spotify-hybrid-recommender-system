@@ -7,3 +7,4 @@ notebook
 streamlit
 dvc
 category_encoders
+dask[dataframe]

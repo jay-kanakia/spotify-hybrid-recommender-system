@@ -6,8 +6,8 @@ stages:
     - ./src/data/content_filtering_data_cleaning.py
     outs:
     - ./data/cleaned/df_songs_cleaned.csv
-  data_transformation:
-    cmd: python ./src/data/content_filtering_data_transformation.py
+  data_transformation_content:
+    cmd: python -m src.data.content_filtering_data_transformation
     deps:
     - ./data/cleaned/df_songs_cleaned.csv
     - ./src/data/content_filtering_data_cleaning.py
@@ -15,3 +15,13 @@ stages:
     outs:
     - ./data/processed/content_filtering_transformed_data.npz
     - ./models/transformer.joblib
+  data_transfromation_colab:
+    cmd: python ./src/data/collaborative_filtering_data_transformation.py
+    deps:
+    - ./data/cleaned/df_songs_cleaned.csv
+    - ./data/raw/User Listening History.csv
+    - ./src/data/collaborative_filtering_data_transformation.py
+    outs:
+    - ./data/filtered/Colab_filtered_data.csv
+    - ./data/processed/interaction_matrix.npz
+    - ./data/track_ids.npy
