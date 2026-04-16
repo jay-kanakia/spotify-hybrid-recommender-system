@@ -122,17 +122,16 @@ def save_interaction_matrix(interaction_matrix,interaction_matrix_path):
 
     save_npz(interaction_matrix_path,interaction_matrix)
 
-def collaborative_recommendation(song_name,artist_name,track_ids,df_songs,interaction_matrix,k=5):
+def collaborative_recommendation(song_name,track_ids,df_songs,interaction_matrix,k=5):
 
     # lower case song and artist name
     song_name = song_name.lower()
-    artist_name = artist_name.lower()
 
     # fetch the row from songs data
-    song_row = df_songs.loc[(df_songs['name'] == song_name) & (df_songs['artist'] == artist_name)]
+    song_row = df_songs.loc[(df_songs['name'] == song_name)]
 
     # track id of input song
-    input_track_id = song_row.loc['track_id'].values.item()
+    input_track_id = song_row['track_id'].values.item()
 
     # index value of track id
     input_track_index = np.where(track_ids == input_track_id)[0].item()
@@ -147,7 +146,7 @@ def collaborative_recommendation(song_name,artist_name,track_ids,df_songs,intera
     recommendation_indices = np.argsort(similarity_score.ravel())[-k-1:][::-1]
 
     # get top k recommendations
-    recommended_track_ids = track_ids(recommendation_indices)
+    recommended_track_ids = track_ids[recommendation_indices]
 
     # get top scores
     top_scores = np.sort(similarity_score.ravel())[-k-1:][::-1]
@@ -155,7 +154,7 @@ def collaborative_recommendation(song_name,artist_name,track_ids,df_songs,intera
     # get the songs from data
     temp_df = pd.DataFrame(
         {
-            'track_ids' : recommendation_indices.tolist(),
+            'track_id' : recommended_track_ids.tolist(),
             'scores' : top_scores
         }
     )

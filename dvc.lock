@@ -77,8 +77,8 @@ stages:
       size: 602515573
     - path: ./src/data/collaborative_filtering_data_transformation.py
       hash: md5
-      md5: 814809089e76dd14add392fa9ace8684
-      size: 6319
+      md5: f13b0cd297a396e90758b7764c630a6f
+      size: 6226
     outs:
     - path: ./data/filtered/Colab_filtered_data.csv
       hash: md5
