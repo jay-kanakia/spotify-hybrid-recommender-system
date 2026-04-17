@@ -42,7 +42,7 @@ jobs:
 
       - name: Test App
         run: |
-          pytest test_app.py
+          pytest tests/test_app.py
 
       - name: Stop Streamlit app
         run: |
