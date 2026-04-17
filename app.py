@@ -57,38 +57,44 @@ def main():
     root_path = Path(__file__).parent
 
     # transformed data path
-    transformed_data_path = root_path/"data"/"processed"/"hybrid_transformed_filtered_data.npz"
+    transformed_data_path = root_path/"data"/"processed"/"content_filtering_transformed_data.npz"
 
     # load transformed data
-    transformed_data = load_npz_data(transformed_data_path)
+    st.session_state.transformed_data = load_npz_data(transformed_data_path)
+
+    # transformed hybrid data path
+    transformed_hybrid_data_path = root_path/"data"/"processed"/"hybrid_transformed_filtered_data.npz"
+
+    # load transformed hybrid data
+    st.session_state.transformed_hybrid_data = load_npz_data(transformed_hybrid_data_path)
     logger.info("Transformed data loaded successfully")
 
     # cleaned data path
     cleaned_data_path = root_path/"data"/"cleaned"/"df_songs_cleaned.csv"
 
     # load clean data
-    df_songs = load_data(cleaned_data_path)
+    st.session_state.df_songs = load_data(cleaned_data_path)
     logger.info("Cleaned data loaded successfully")
 
     # load original data
     org_data_path = root_path/"data"/"raw"/"Music Info.csv"
-    org_data = load_data(org_data_path)
+    st.session_state.org_data = load_data(org_data_path)
 
     # filtered data path
     filtered_path = root_path/"data"/"filtered"/"Colab_filtered_data.csv"
-    df_filtered = load_data(filtered_path)
+    st.session_state.df_filtered = load_data(filtered_path)
 
     # interaction matrix path
     interaction_matrix_path = root_path/"data"/"processed"/"interaction_matrix.npz"
 
     # load interaction matrix
-    interaction_mat = load_npz_data(interaction_matrix_path)
+    st.session_state.interaction_mat = load_npz_data(interaction_matrix_path)
 
     # track_ids path
     track_id_path = root_path/"data"/"track_ids.npy"
 
     # load track_ids
-    track_ids = load_np(track_id_path)
+    st.session_state.track_ids = load_np(track_id_path)
 
 # ===========================================================================================
 
@@ -99,8 +105,8 @@ def main():
     st.write('### Enter the name of a song and the recommender will suggest similar songs 🎵🎧')
 
     # text input
-    song_list = org_data['name'].to_list()
-    artist_list = org_data['artist'].to_list()
+    song_list = st.session_state.org_data['name'].to_list()
+    artist_list = st.session_state.org_data['artist'].to_list()
 
     song_options = [
     {"name": i, "artist": j}
@@ -114,7 +120,7 @@ def main():
 
     selected = st.selectbox("Select a Song", list(label_to_song.keys()))
     song_name_org = label_to_song[selected]["name"]
-    artist_name = label_to_song[selected]["artist"]
+    #artist_name = label_to_song[selected]["artist"]
 
     st.write('You entered :',selected)
 
@@ -124,15 +130,33 @@ def main():
     # select no. of recommendation
     k = st.selectbox('How many recommendation you need?',[5,10,15,20],index=1)
 
-    # type of filtering
-    filtering_type = st.selectbox('Select the type of filtering:', ['Content-Based Filtering', 'Collaborative Filtering','Hybrid Recommender System'],index=2)
+    if (st.session_state.df_filtered['name'] == song_name).any():
+
+        # type of filtering
+        filtering_type = st.selectbox('Select the type of filtering:', ['Content-Based Filtering', 'Collaborative Filtering','Hybrid Recommender System'],index=2)
+
+        # diversity slider
+        diversity  = st.slider(label='Diversity in Recommendation',
+                                      min_value=1,
+                                      max_value=10,
+                                      step=1,
+                                      value=5
+                                      )
+        
+        # content based weight
+        weight_content_based = 1 - (diversity/10)
+
+    else:
+
+        # type of filtering
+        filtering_type = st.selectbox(label='Select the type of filtering:',options=['Content-Based Filtering'],index=0)
 
     # Button
     if filtering_type == 'Content-Based Filtering':
         if st.button('Get Recommendation'):
-            if (df_songs['name'] == song_name).any():
+            if (st.session_state.df_songs['name'] == song_name).any():
                 st.write('Recommendation for', f"**{selected}**")
-                recommendations = content_recommendation(song_name,df_songs,transformed_data,k)
+                recommendations = content_recommendation(song_name,st.session_state.df_songs,st.session_state.transformed_data,k)
 
                 # Display recommendations
                 for ind, recommendation in recommendations.iterrows():
@@ -161,9 +185,9 @@ def main():
                 
     elif filtering_type == 'Collaborative Filtering':
         if st.button('Get Recommendation'):
-            if (df_filtered['name'] == song_name).any():
+            if (st.session_state.df_filtered['name'] == song_name).any():
                 st.write('Recommendation for', f"**{selected}**")
-                recommendations = collaborative_recommendation(song_name,track_ids,df_filtered,interaction_mat,k)
+                recommendations = collaborative_recommendation(song_name,st.session_state.track_ids,st.session_state.state.df_filtered,st.session_state.interaction_mat,k)
 
                 # Display recommendations
                 for ind, recommendation in recommendations.iterrows():
@@ -193,10 +217,10 @@ def main():
                 
     elif filtering_type == "Hybrid Recommender System":
         if st.button('Get Recommmendation'):
-            if (df_filtered['name'] == song_name).any():
+            if (st.session_state.df_filtered['name'] == song_name).any():
                 st.write('Recommendation for', f"**{selected}**")
-                recommender = HybridRecommenderSystem(number_of_recommendation=k,weight_content_based=0.3)
-                recommendations = recommender.give_recommmendations(song_name,df_filtered,track_ids,transformed_data,interaction_mat)
+                recommender = HybridRecommenderSystem(number_of_recommendation=k,weight_content_based=weight_content_based)
+                recommendations = recommender.give_recommmendations(song_name,st.session_state.df_filtered,st.session_state.track_ids,st.session_state.transformed_hybrid_data,st.session_state.interaction_mat)
                 
                 # Display recommendations
                 for ind, recommendation in recommendations.iterrows():

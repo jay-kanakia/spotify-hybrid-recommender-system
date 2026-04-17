@@ -8,3 +8,6 @@ streamlit
 dvc
 category_encoders
 dask[dataframe]
+dvc_s3
+awscli
+pytest
