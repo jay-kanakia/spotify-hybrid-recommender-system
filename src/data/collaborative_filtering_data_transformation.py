@@ -46,11 +46,12 @@ def filtered_data(df_songs:pd.DataFrame,df_users:pd.DataFrame)->pd.DataFrame:
     Filter the songs data for the given track ids
     """
 
-    # get track ids from user data
-    track_ids = df_users['track_id']
+    # get the unique track ids
+    unique_track_ids = df_users.loc[:,"track_id"].unique().compute()
+    unique_track_ids = unique_track_ids.tolist()
 
     # filtering songs
-    df_songs = df_songs[df_songs['track_id'].isin(track_ids)]
+    df_songs = df_songs[df_songs['track_id'].isin(unique_track_ids)]
 
     # reseting the index
     df_songs.reset_index(drop=True,inplace=True)
@@ -66,8 +67,11 @@ def save_filtered_data(df:pd.DataFrame,save_filtered_data_path:Path)->None:
     df.to_csv(save_filtered_data_path,index=False)
 
 
-def interaction_matrix(df_user,track_id_path):
+def interaction_matrix(df_songs,df_user,track_id_path):
     
+    track_ids = df_songs['track_id'].unique()
+    df_user = df_user[df_user['track_id'].isin(track_ids)]
+
     # creating a copy
     df = df_user.copy()
 
@@ -176,10 +180,10 @@ def main():
     root_path = Path(__file__).parent.parent.parent
 
     # cleaned data path
-    cleaned_data_path = root_path/"data"/"cleaned"/"df_songs_cleaned.csv"
+    df_songs_data_path = root_path/"data"/"cleaned"/"df_songs_cleaned.csv"
 
     # load clean data
-    df_songs = load_songs_data(data_path=cleaned_data_path)
+    df_songs = load_songs_data(data_path=df_songs_data_path)
     logger.info('Songs data loaded')
 
     # user data path
@@ -187,10 +191,12 @@ def main():
 
     # load user data
     df_users = load_users_data(data_path=user_data_path)
+    print('shape of the df_users is',df_users.shape)
     logger.info('User data loaded')
 
     # filtering the data
     df_filtered = filtered_data(df_songs,df_users)
+    print('shape of the filtered data is:',df_filtered.shape)
     logger.info('User data filtered')
 
     # filtered data save path
@@ -205,7 +211,8 @@ def main():
 
 
     # create the interaction matrix
-    interaction_mat = interaction_matrix(df_users,track_id_path)
+    interaction_mat = interaction_matrix(df_songs,df_users,track_id_path)
+    print('shape of the interaction matrix is',interaction_mat.shape)
     logger.info('interaction matrix created')
 
     # interaction matrix save path

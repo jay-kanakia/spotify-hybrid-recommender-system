@@ -17,7 +17,7 @@ formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - %(levelname)s - %(me
 # add formatter to handler
 console_handler.setFormatter(formatter)
 
-# add handler to logger
+# add handler to the logger
 logger.addHandler(console_handler)
 
 def load_data(data_path:Path)->pd.DataFrame:

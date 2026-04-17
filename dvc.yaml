@@ -25,3 +25,10 @@ stages:
     - ./data/filtered/Colab_filtered_data.csv
     - ./data/processed/interaction_matrix.npz
     - ./data/track_ids.npy
+  hybrid_transformed_filtered_data:
+    cmd: python -m src.data.hybrid_transformed_filtered_data
+    deps:
+    - ./data/filtered/Colab_filtered_data.csv
+    - ./src/data/hybrid_transformed_filtered_data.py
+    outs:
+    - ./data/processed/hybrid_transformed_filtered_data.npz

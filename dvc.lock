@@ -9,8 +9,8 @@ stages:
       size: 14985870
     - path: ./src/data/content_filtering_data_cleaning.py
       hash: md5
-      md5: 35e1413eb9f3dbea79fe4f3b121a8369
-      size: 3376
+      md5: 64b56ad9b6b75d4e7a7c21a0c7301892
+      size: 3380
     outs:
     - path: ./data/cleaned/df_songs_cleaned.csv
       hash: md5
@@ -49,8 +49,8 @@ stages:
       size: 13709636
     - path: ./src/data/content_filtering_data_cleaning.py
       hash: md5
-      md5: 35e1413eb9f3dbea79fe4f3b121a8369
-      size: 3376
+      md5: 64b56ad9b6b75d4e7a7c21a0c7301892
+      size: 3380
     - path: ./src/data/content_filtering_data_transformation.py
       hash: md5
       md5: 53d98d17b1a422d25ae9fe2786dd9600
@@ -77,8 +77,8 @@ stages:
       size: 602515573
     - path: ./src/data/collaborative_filtering_data_transformation.py
       hash: md5
-      md5: f13b0cd297a396e90758b7764c630a6f
-      size: 6226
+      md5: 4471ea7802714044ef57fcd7a20a95f9
+      size: 6626
     outs:
     - path: ./data/filtered/Colab_filtered_data.csv
       hash: md5
@@ -86,9 +86,25 @@ stages:
       size: 8259927
     - path: ./data/processed/interaction_matrix.npz
       hash: md5
-      md5: 6be93bc6fc4f2f97bb807f8fad3a58c7
-      size: 32215202
+      md5: ee1c7c545d108b86e621b9911adeac57
+      size: 32214966
     - path: ./data/track_ids.npy
       hash: md5
-      md5: 4a52e4cb6bae6b0126c1344dac7c7686
-      size: 640058
+      md5: 2b98965823457fdb6526d3c5df182d03
+      size: 640016
+  hybrid_transformed_filtered_data:
+    cmd: python -m src.data.hybrid_transformed_filtered_data
+    deps:
+    - path: ./data/filtered/Colab_filtered_data.csv
+      hash: md5
+      md5: c0fc661e2f86835ab81094d000285e93
+      size: 8259927
+    - path: ./src/data/hybrid_transformed_filtered_data.py
+      hash: md5
+      md5: 184d64665fcbac701f6d982b4163dd17
+      size: 2293
+    outs:
+    - path: ./data/processed/hybrid_transformed_filtered_data.npz
+      hash: md5
+      md5: ef1c852c55cafa1102c63bd914f2b568
+      size: 2735862
