@@ -1,0 +1,9 @@
+# exclude large file
+data/raw/User Listening History.csv
+
+# Standard clean-up
+__pycache__/
+*.pyc
+.git/
+myenv/
+.ipynb_checkpoints/
