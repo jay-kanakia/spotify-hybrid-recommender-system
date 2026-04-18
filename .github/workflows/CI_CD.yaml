@@ -81,7 +81,7 @@ jobs:
           aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws deploy create-deployment \
           --application-name SpotifyCodeDeployApp \
-          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-config-name CodeDeployDefault.OneAtATime \
           --deployment-group-name SpotifyDeploymentGroup \
           --s3-location bucket=spotify-code-deploy-s3-bucket,key=deployment.zip,bundleType=zip \
           --file-exists-behavior OVERWRITE \
