@@ -73,7 +73,7 @@ jobs:
         run: |
           aws s3 cp deployment.zip s3://spotify-code-deploy-s3-bucket/deployment.zip
 
-      # Deploy to AWS CodeDeploy using the uploaded ZIP files
+      # Deploy to the AWS CodeDeploy using the uploaded ZIP files
       - name: Deploy to AWS CodeDeploy
         if: success()
         run: |
