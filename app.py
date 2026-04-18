@@ -77,8 +77,8 @@ def main():
     logger.info("Cleaned data loaded successfully")
 
     # load original data
-    org_data_path = root_path/"data"/"raw"/"Music Info.csv"
-    st.session_state.org_data = load_data(org_data_path)
+    # org_data_path = root_path/"data"/"raw"/"Music Info.csv"
+    # st.session_state.org_data = load_data(org_data_path)
 
     # filtered data path
     filtered_path = root_path/"data"/"filtered"/"Colab_filtered_data.csv"
@@ -97,159 +97,263 @@ def main():
     st.session_state.track_ids = load_np(track_id_path)
 
 # ===========================================================================================
+    st.sidebar.title("📂 Navigation")
 
-    # title
-    st.title("Welcome to the Spotify Song Recommender!")
+    section = st.sidebar.radio(
+        "Go to:",
+        [
+            "🎧 Recommender",
+            "🧠 How It Works",
+            "📊 Dataset & Scale",
+            "☁️ Architecture",
+            "👨‍💻 About"
+        ]
+    )
 
-    # sub header
-    st.write('### Enter the name of a song and the recommender will suggest similar songs 🎵🎧')
+    if section == "🎧 Recommender":
+        st.title("🎧 Spotify Hybrid Recommender")
 
-    # text input
-    song_list = st.session_state.org_data['name'].to_list()
-    artist_list = st.session_state.org_data['artist'].to_list()
+        # your input + output UI here
 
-    song_options = [
-    {"name": i, "artist": j}
-    for i, j in zip(song_list, artist_list)
-    ]
+        st.info("""
+            💡 Try exploring artists like **Radiohead, Bob Dylan, or Metallica**
 
-    label_to_song = {
-        f"{s['name']} by {s['artist']}": s
-        for s in song_options
-    }
+            🎧 Dataset highlights:
+            - English songs released between **1960 – 2020**
+            - Strong representation from the **2000–2010 era**
+            - Prominent artists include *The Rolling Stones, Radiohead, Tom Waits, and Johnny Cash*
+            - Dominant genres: **Rock, Electronic, Metal**, along with Pop, Rap, and Jazz
+            """)
+    
+# ============================================================================================
 
-    selected = st.selectbox("Select a Song", list(label_to_song.keys()))
-    song_name_org = label_to_song[selected]["name"]
-    #artist_name = label_to_song[selected]["artist"]
+        # title
+        #st.title("Welcome to the Spotify Song Recommender!")
 
-    st.write('You entered :',selected)
+        # sub header
+        st.write('### Enter the name of a song and the recommender will suggest similar songs 🎵🎧')
 
-    # lowercase the input
-    song_name = song_name_org.lower()
+        # text input
+        song_list = st.session_state.df_songs['name'].to_list()
+        artist_list = st.session_state.df_songs['artist'].to_list()
 
-    # select no. of recommendation
-    k = st.selectbox('How many recommendation you need?',[5,10,15,20],index=1)
+        song_options = [
+        {"name": i, "artist": j}
+        for i, j in zip(song_list, artist_list)
+        ]
 
-    if (st.session_state.df_filtered['name'] == song_name).any():
+        label_to_song = {
+            f"{s['name'].title()} by {s['artist'].title()}": s
+            for s in song_options
+        }
 
-        # type of filtering
-        filtering_type = st.selectbox('Select the type of filtering:', ['Content-Based Filtering', 'Collaborative Filtering','Hybrid Recommender System'],index=2)
+        selected = st.selectbox("Select a Song", list(label_to_song.keys()))
+        song_name_org = label_to_song[selected]["name"]
+        #artist_name = label_to_song[selected]["artist"]
 
-        # diversity slider
-        diversity  = st.slider(label='Diversity in Recommendation',
-                                      min_value=1,
-                                      max_value=10,
-                                      step=1,
-                                      value=5
-                                      )
-        
-        # content based weight
-        weight_content_based = 1 - (diversity/10)
+        st.write('You entered :',selected)
 
-    else:
+        # lowercase the input
+        song_name = song_name_org.lower()
 
-        # type of filtering
-        filtering_type = st.selectbox(label='Select the type of filtering:',options=['Content-Based Filtering'],index=0)
+        # select no. of recommendation
+        k = st.selectbox('How many recommendation you need?',[5,10,15,20],index=1)
 
-    # Button
-    if filtering_type == 'Content-Based Filtering':
-        if st.button('Get Recommendation'):
-            if (st.session_state.df_songs['name'] == song_name).any():
-                st.write('Recommendation for', f"**{selected}**")
-                recommendations = content_recommendation(song_name,st.session_state.df_songs,st.session_state.transformed_data,k)
+        if (st.session_state.df_filtered['name'] == song_name).any():
 
-                # Display recommendations
-                for ind, recommendation in recommendations.iterrows():
-                    rec_song_name = recommendation['name'].title()
-                    rec_artist_name = recommendation['artist'].title()
+            # type of filtering
+            filtering_type = st.selectbox('Select the type of filtering:', ['Content-Based Filtering', 'Collaborative Filtering','Hybrid Recommender System'],index=2)
 
-                    if ind == 0:
-                        st.markdown('## Currently Playing')
-                        st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+            # diversity slider
+            diversity  = st.slider(label='Diversity in Recommendation',
+                                        min_value=1,
+                                        max_value=10,
+                                        step=1,
+                                        value=5
+                                        )
+            
+            # content based weight
+            weight_content_based = 1 - (diversity/10)
 
-                    elif ind == 1:
-                        st.markdown('### Next Up 🎵')
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+        else:
 
-                    else:
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+            # type of filtering
+            filtering_type = st.selectbox(label='Select the type of filtering:',options=['Content-Based Filtering'],index=0)
 
-            else:
-                st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
-                
-    elif filtering_type == 'Collaborative Filtering':
-        if st.button('Get Recommendation'):
-            if (st.session_state.df_filtered['name'] == song_name).any():
-                st.write('Recommendation for', f"**{selected}**")
-                recommendations = collaborative_recommendation(song_name,st.session_state.track_ids,st.session_state.state.df_filtered,st.session_state.interaction_mat,k)
+        # Button
+        if filtering_type == 'Content-Based Filtering':
+            if st.button('Get Recommendation'):
+                if (st.session_state.df_songs['name'] == song_name).any():
+                    st.write('Recommendation for', f"**{selected}**")
+                    recommendations = content_recommendation(song_name,st.session_state.df_songs,st.session_state.transformed_data,k)
 
-                # Display recommendations
-                for ind, recommendation in recommendations.iterrows():
-                    rec_song_name = recommendation['name'].title()
-                    rec_artist_name = recommendation['artist'].title()
+                    # Display recommendations
+                    for ind, recommendation in recommendations.iterrows():
+                        rec_song_name = recommendation['name'].title()
+                        rec_artist_name = recommendation['artist'].title()
 
-                    if ind == 0:
-                        st.markdown('## Currently Playing')
-                        st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        if ind == 0:
+                            st.markdown('## Currently Playing')
+                            st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
-                    elif ind == 1:
-                        st.markdown('### Next Up 🎵')
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        elif ind == 1:
+                            st.markdown('### Next Up 🎵')
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
-                    else:
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        else:
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
+                else:
+                    st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
+                    
+        elif filtering_type == 'Collaborative Filtering':
+            if st.button('Get Recommendation'):
+                if (st.session_state.df_filtered['name'] == song_name).any():
+                    st.write('Recommendation for', f"**{selected}**")
+                    recommendations = collaborative_recommendation(song_name,st.session_state.track_ids,st.session_state.df_filtered,st.session_state.interaction_mat,k)
 
-            else:
-                st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
-                
-    elif filtering_type == "Hybrid Recommender System":
-        if st.button('Get Recommmendation'):
-            if (st.session_state.df_filtered['name'] == song_name).any():
-                st.write('Recommendation for', f"**{selected}**")
-                recommender = HybridRecommenderSystem(number_of_recommendation=k,weight_content_based=weight_content_based)
-                recommendations = recommender.give_recommmendations(song_name,st.session_state.df_filtered,st.session_state.track_ids,st.session_state.transformed_hybrid_data,st.session_state.interaction_mat)
-                
-                # Display recommendations
-                for ind, recommendation in recommendations.iterrows():
-                    rec_song_name = recommendation['name'].title()
-                    rec_artist_name = recommendation['artist'].title()
+                    # Display recommendations
+                    for ind, recommendation in recommendations.iterrows():
+                        rec_song_name = recommendation['name'].title()
+                        rec_artist_name = recommendation['artist'].title()
 
-                    if ind == 0:
-                        st.markdown('## Currently Playing')
-                        st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        if ind == 0:
+                            st.markdown('## Currently Playing')
+                            st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
-                    elif ind == 1:
-                        st.markdown('### Next Up 🎵')
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        elif ind == 1:
+                            st.markdown('### Next Up 🎵')
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
-                    else:
-                        st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
-                        st.audio(recommendation['spotify_preview_url'])
-                        st.write('---')
+                        else:
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
 
-            else:
-                st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
+                else:
+                    st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
+                    
+        elif filtering_type == "Hybrid Recommender System":
+            if st.button('Get Recommmendation'):
+                if (st.session_state.df_filtered['name'] == song_name).any():
+                    st.write('Recommendation for', f"**{selected}**")
+                    recommender = HybridRecommenderSystem(number_of_recommendation=k,weight_content_based=weight_content_based)
+                    recommendations = recommender.give_recommmendations(song_name,st.session_state.df_filtered,st.session_state.track_ids,st.session_state.transformed_hybrid_data,st.session_state.interaction_mat)
+                    
+                    # Display recommendations
+                    for ind, recommendation in recommendations.iterrows():
+                        rec_song_name = recommendation['name'].title()
+                        rec_artist_name = recommendation['artist'].title()
+
+                        if ind == 0:
+                            st.markdown('## Currently Playing')
+                            st.markdown(f'### **{rec_song_name}** by **{rec_artist_name}**')
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
+
+                        elif ind == 1:
+                            st.markdown('### Next Up 🎵')
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
+
+                        else:
+                            st.markdown(f"### {ind}. **{rec_song_name}** by **{rec_artist_name}**")
+                            st.audio(recommendation['spotify_preview_url'])
+                            st.write('---')
 
 
+                else:
+                    st.write(f"Sorry, we couldn't find {song_name} in our database. Please try another song.")
 
+    elif section == "🧠 How It Works":
+        st.header("🧠 Model Overview")
+
+        with st.expander("🔍 Hybrid Recommendation Logic"):
+            st.markdown("""
+                This system combines **content-based** and **collaborative filtering** to generate high-quality recommendations:
+
+                **🎯 Content-Based Filtering**
+                - Uses audio features such as **tempo, loudness, key, mode**
+                - Includes advanced attributes like **acousticness, instrumentalness, speechiness, liveness**
+                - Computes similarity between songs using feature vectors
+
+                **🤝 Collaborative Filtering**
+                - Built on **10 million user–song interactions**
+                - Covers **1 million users** and **30K songs**
+                - Captures implicit listening patterns and user behavior
+
+                **⚖️ Hybrid Ranking**
+                - Combines both approaches to balance **accuracy** and **discovery**
+                - Includes a **diversity slider** to control personalization vs exploration
+                """)
+
+        with st.expander("⚙️ Algorithms Used"):
+            st.markdown("""
+                - 📐 **Cosine Similarity** for content-based recommendations  
+                - 🧮 **Sparse Matrix Representations** for efficient large-scale computation  
+                - ⚡ **Dask** for parallel processing and scalability  
+
+                **🚀 Optimization Highlight**
+                - Reduced memory usage from **~60 GB → ~31 MB**
+                - Achieved using **SciPy sparse matrices + distributed computation**
+                """)            
+
+    elif section == "📊 Dataset & Scale":
+        st.header("📊 Dataset & Scale")
+
+        st.markdown("""
+            ### 📊 Dataset & Scale
+
+            - 🎵 50,000 songs (content-based filtering)  
+            - 🤝 30,000 songs (collaborative filtering)  
+            - 👥 1,000,000 users  
+            - 🔄 10,000,000 user–song interactions  
+            """)
+
+        st.success("✅ Designed to simulate real-world recommendation systems at scale")
+
+    elif section == "☁️ Architecture":
+        st.header("☁️ Deployment Architecture")
+
+        st.markdown("""
+            ### ☁️ Deployment Architecture
+
+            - 🖥️ **AWS EC2 instances** running the Streamlit application  
+            - 🔁 **Auto Scaling Group (ASG)** with launch templates to dynamically scale based on traffic/load  
+            - 🌐 **Load Balancer** for efficient request distribution across instances  
+            - 📦 **Stateless architecture** enabling horizontal scalability  
+
+            **🚀 Deployment Strategy**
+            - 🔄 **Blue-Green Deployment** ensures zero-downtime releases  
+            - ✅ All instances run consistent, version-controlled code  
+            - ↩️ **Rollback mechanism** in place for quick recovery in case of failure  
+            """)
+
+        st.info("🚀 This setup ensures reliability under varying user load")
+
+    elif section == "👨‍💻 About":
+        st.header("👨‍💻 About the Project")
+
+        st.markdown("""
+        **Jay Kanakia**  
+        Spotify Hybrid Recommender System  
+
+        🔗 GitHub: https://github.com/jay-kanakia  
+        🌐 Portfolio: https://abc.com  
+        💼 LinkedIn: https://www.linkedin.com/in/jaykanakia-mlops/?skipRedirect=true 
+        """)
 
 if __name__ == "__main__":
     main()

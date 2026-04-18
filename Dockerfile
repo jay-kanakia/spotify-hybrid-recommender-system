@@ -1,5 +1,5 @@
 # set up the base image
-FROM python:3.12
+FROM python:3.12-slim
 
 # set the working directory
 WORKDIR /app/
@@ -8,20 +8,19 @@ WORKDIR /app/
 COPY requirements.txt .
 
 # install the requirements
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # copy data files
 COPY ./data ./data
 
 
-# COPY ["./data/filtered/Colab_filtered_data.csv", \
-#       "./data/processed/interaction_matrix.npz", \
-#       "./data/processed/hybrid_transformed_filtered_data.npz", \
-#       "./data/track_ids.npy", \
-#       "./data/cleaned/df_songs_cleaned.csv", \
-#       "./data/processed/content_filtering_transformed_data.npz", \
-#       "./data/raw/Music Info.csv", \
-#       "./data/"]
+# COPY ./data/filtered/Colab_filtered_data.csv \
+#      ./data/processed/interaction_matrix.npz \
+#      ./data/processed/hybrid_transformed_filtered_data.npz \
+#      ./data/track_ids.npy \
+#      ./data/cleaned/df_songs_cleaned.csv \
+#      ./data/processed/content_filtering_transformed_data.npz \
+#      ./data/
 
 # copy all required python scripts
 COPY app.py .
