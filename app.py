@@ -49,11 +49,20 @@ def main():
         ["🎧 Recommender", "🧠 How It Works", "📊 Dataset & Scale", "☁️ Architecture", "👨‍💻 About"]
     )
 
-
+    
     # ---------------- RECOMMENDER ----------------
+    
     if section == "🎧 Recommender":
 
         st.title("🎧 Spotify Hybrid Recommender")
+
+        st.info("""
+            🎧 Highlights:
+            - English songs released between **1960 – 2020**
+            - Strong representation from the **2000–2010 era**
+            - Prominent artists include *The Rolling Stones, Radiohead, Tom Waits, and Johnny Cash*
+            - Dominant genres: **Rock, Electronic, Metal**, along with Pop, Rap, and Jazz
+            """)
 
         st.write("### Select a song 🎵")
 
@@ -86,22 +95,19 @@ def main():
         exists = (df_filtered['name'] == song_name).any()
 
         if exists:
-            filtering_type = st.selectbox(
-                "Select filtering type:",
-                ["Content-Based Filtering", "Collaborative Filtering", "Hybrid Recommender System"],
-                index=2
-            )
+            filtering_type = "Hybrid Recommender System"
 
-            diversity = st.slider("Diversity", 1, 10, 5)
+            # diversity slider
+            diversity = st.slider(label="Diversity in Recommendations",
+                        min_value=1,
+                        max_value=9,
+                        value=5,
+                        step=1)
+            
             weight_content = 1 - (diversity / 10)
 
         else:
-            filtering_type = st.selectbox(
-                "Select filtering type:",
-                ["Content-Based Filtering"],
-                index=0
-            )
-
+            filtering_type = "Content-Based Filtering"
 
         # ---------------- CONTENT ----------------
         if filtering_type == "Content-Based Filtering":
@@ -114,26 +120,6 @@ def main():
                 ]['spotify_preview_url'].values[0]
 
                 display(recs, song_name_org, artist_name_org, audio_url)
-
-
-        # ---------------- COLLAB ----------------
-        elif filtering_type == "Collaborative Filtering":
-            if st.button("Get Recommendation"):
-
-                recs = collaborative_recommendation(
-                    song_name,
-                    track_ids,
-                    df_filtered,
-                    interaction_mat,
-                    k
-                )
-
-                audio_url = df_filtered[
-                    df_filtered['name'] == song_name
-                ]['spotify_preview_url'].values[0]
-
-                display(recs, song_name_org, artist_name_org, audio_url)
-
 
         # ---------------- HYBRID ----------------
         elif filtering_type == "Hybrid Recommender System":
@@ -157,6 +143,95 @@ def main():
                 ]['spotify_preview_url'].values[0]
 
                 display(recs, song_name_org, artist_name_org, audio_url)
+
+    # ---------------- 🧠 How It Works ----------------
+
+    if section == "🧠 How It Works":
+        st.header("🧠 Model Overview")
+
+        with st.expander("🔍 Hybrid Recommendation Logic"):
+            st.markdown("""
+                This system combines **content-based** and **collaborative filtering** to generate high-quality recommendations:
+
+                **🎯 Content-Based Filtering**
+                - Uses audio features such as **tempo, loudness, key, mode**
+                - Includes advanced attributes like **acousticness, instrumentalness, speechiness, liveness**
+                - Computes similarity between songs using feature vectors
+
+                **🤝 Collaborative Filtering**
+                - Built on **10 million user–song interactions**
+                - Covers **1 million users** and **30K songs**
+                - Captures implicit listening patterns and user behavior
+
+                **⚖️ Hybrid Ranking**
+                - Combines both approaches to balance **accuracy** and **discovery**
+                - Includes a **diversity slider** to control personalization vs exploration
+                """)
+
+        with st.expander("⚙️ Algorithms Used"):
+            st.markdown("""
+                - 📐 **Cosine Similarity** for content-based recommendations  
+                - 🧮 **Sparse Matrix Representations** for efficient large-scale computation  
+                - ⚡ **Dask** for parallel processing and scalability  
+
+                **🚀 Optimization Highlight**
+                - Reduced memory usage from **~60 GB → ~31 MB**
+                - Achieved using **SciPy sparse matrices + distributed computation**
+                """)            
+
+    # ---------------- 📊 Dataset & Scale ----------------
+
+    if section == "📊 Dataset & Scale":
+        st.header("📊 Dataset & Scale")
+
+        st.markdown("""
+            ### 📊 Dataset & Scale
+
+            - 🎵 50,000 songs (content-based filtering)  
+            - 🤝 30,000 songs (collaborative filtering)  
+            - 👥 1,000,000 users  
+            - 🔄 10,000,000 user–song interactions  
+            """)
+
+        st.success("✅ Designed to simulate real-world recommendation systems at scale")
+
+    # ---------------- ☁️ Architecture ----------------
+
+    if section == "☁️ Architecture":
+        st.header("☁️ Deployment Architecture")
+
+        st.markdown("""
+            ### ☁️ Deployment Architecture
+
+            - 🖥️ **AWS EC2 instances** running the Streamlit application  
+            - 🔁 **Auto Scaling Group (ASG)** with launch templates to dynamically scale based on traffic/load  
+            - 🌐 **Load Balancer** for efficient request distribution across instances  
+            - 📦 **Stateless architecture** enabling horizontal scalability  
+
+            **🚀 Deployment Strategy**
+            - 🔄 **Rolling Deployment** ensures zero-downtime releases  
+            - ✅ All instances run consistent, version-controlled code  
+            - ↩️ **Rollback mechanism** in place for quick recovery in case of failure  
+            """)
+
+        st.info("🚀 This setup ensures reliability under varying user load")
+
+    # ---------------- 👨‍💻 About ----------------
+
+    if section == "👨‍💻 About":
+        st.header("👨‍💻 About the Project")
+
+        st.markdown("""
+        <span style="background-color:#1f77b4; color:white; padding:4px 8px; border-radius:6px;">
+        <strong>Jay Kanakia</strong>
+        </span>  
+
+        Spotify Hybrid Recommender System  
+
+        🔗 GitHub: https://github.com/jay-kanakia/spotify-hybrid-recommender-system  
+        🌐 Portfolio: https://abc.com  
+        💼 LinkedIn: https://www.linkedin.com/in/jaykanakia-mlops/
+        """, unsafe_allow_html=True)
 
 
 # ---------------- DISPLAY FUNCTION (FIXED CORE ISSUE) ----------------
