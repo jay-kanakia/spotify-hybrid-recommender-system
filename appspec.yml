@@ -7,7 +7,7 @@ hooks:
   BeforeInstall:
     - location: deploy/scripts/install_dependencies.sh
       timeout: 300
-      runas: root
+      runas: ubuntu
   ApplicationStart:
     - location: deploy/scripts/start_docker.sh
       timeout: 300

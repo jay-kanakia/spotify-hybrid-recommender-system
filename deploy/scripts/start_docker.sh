@@ -20,6 +20,6 @@ if [ "$(docker ps -aq -f name=spotify-ecr)" ]; then
 fi
 
 echo "Starting new container..."
-docker run -d -p 8000:8000 --name spotify-ecr 901619351636.dkr.ecr.us-east-1.amazonaws.com/spotify-ecr:latest
+docker run -d -p 80:8000 --name spotify-ecr 901619351636.dkr.ecr.us-east-1.amazonaws.com/spotify-ecr:latest
 
 echo "Container started successfully."
