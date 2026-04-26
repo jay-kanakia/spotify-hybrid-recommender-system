@@ -201,7 +201,6 @@ def main():
         st.header("☁️ Deployment Architecture")
 
         st.markdown("""
-            ### ☁️ Deployment Architecture
 
             - 🖥️ **AWS EC2 instances** running the Streamlit application  
             - 🔁 **Auto Scaling Group (ASG)** with launch templates to dynamically scale based on traffic/load  
