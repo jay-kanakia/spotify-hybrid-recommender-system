@@ -229,7 +229,7 @@ def main():
         Spotify Hybrid Recommender System  
 
         🔗 GitHub: https://github.com/jay-kanakia/spotify-hybrid-recommender-system  
-        🌐 Portfolio: https://abc.com  
+        🌐 Portfolio: https://github.com/jay-kanakia 
         💼 LinkedIn: https://www.linkedin.com/in/jaykanakia-mlops/
         """, unsafe_allow_html=True)
 
