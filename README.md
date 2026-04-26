@@ -1,64 +1,108 @@
-Overview
-An end-to-end MLOps project that builds and deploys a Hybrid Song Recommendation System. The system manages 10 Million interaction rows, optimized from 60GB down to 31MB using SciPy Sparse matrices and Dask.
 
-🛠️ The Production Pipeline
-This project demonstrates a full CI/CD lifecycle for Machine Learning:
+---
 
-Data Versioning: Managed via DVC with AWS S3 as the remote storage.
+## 🧠 Hybrid Recommender System Logic
 
-CI/CD: GitHub Actions triggers on push to execute the DVC pipeline, run Pytest, and build Docker images.
+- **🎯 Content-Based Filtering**  
+  Uses audio feature similarity via **Cosine Similarity**
 
-Containerization: App is dockerized and pushed to Amazon ECR.
+- **👥 Collaborative Filtering**  
+  Learns from user interaction patterns for discovery
 
-Deployment: Automated Rolling Updates to AWS EC2 via CodeDeploy using an Auto-Scaling Group behind an ALB.
+- **🎚️ Diversity Slider**  
+  A weighted hybrid system that allows users to tune recommendation balance
 
-📂 Updated Project Structure
+---
+
+## ⚙️ Installation
+
+```bash
+git clone https://github.com/your-username/project-name.git](https://github.com/jay-kanakia/spotify-hybrid-recommender-system.git
+cd spotify-hybrid-recommender-system
+
+pip install -r requirements.txt
+
+---
+
+## 📂 Project Structure
 
 ├── .github
-│   └── workflows
-│       └── CI_CD.yml          <- GitHub Actions CI/CD Pipeline (DVC -> ECR -> CodeDeploy)
+│ └── workflows
+│ └── CI_CD.yml
 │
 ├── .dvc
-│   └── config                <- DVC configuration (points to S3 remote storage)
+│ └── config
 │
-├── app.py                    <- Main Streamlit Application UI
-├── appspec.yml               <- AWS CodeDeploy configuration
-├── Dockerfile                <- Container configuration for Amazon ECR
-├── requirements.txt          <- Production-level dependencies
-├── dvc.yaml                  <- DVC Pipeline definition (Stages: Data -> Features -> Matrix)
-├── dvc.lock                  <- DVC state file (tracks data hashes for versioning)
+├── app.py
+├── appspec.yml
+├── Dockerfile
+├── requirements.txt
+├── dvc.yaml
+├── dvc.lock
 │
-├── data                      <- Data versioned by DVC (S3-backed)
-│   ├── raw                   <- Original immutable dataset (10M rows)
-│   ├── cleaned               <- Preprocessed/Cleaned data
-│   ├── filtered              <- Intermediate filtered song/user mappings
-│   └── processed             <- Final Sparse Matrices (31MB) & Pickled models
+├── data
+│ ├── raw
+│ ├── cleaned
+│ ├── filtered
+│ └── processed
 │
-├── deploy                    <- Deployment orchestration
-│   └── scripts           
-│       ├── install_dependencies.sh  <- Script for CodeDeploy Agent (EC2 setup)
-│       └── start_docker.sh          <- Script to pull from ECR and run container
+├── deploy
+│ └── scripts
+│ ├── install_dependencies.sh
+│ └── start_docker.sh
 │
-├── src                       <- Source code module
-│   ├── data                  <- Data fetching and S3 ingestion logic
-│   ├── features              <- Feature Engineering & Sparse Matrix generation
-│   └── models                <- Content/Collaborative hybrid logic
+├── src
+│ ├── data
+│ ├── features
+│ └── models
 │
-├── tests                     <- Automated Quality Assurance
-│   └── test_app.py           <- Pytest script for CI/CD smoke tests
+├── tests
+│ └── test_app.py
 │
-├── notebooks                 <- Research & Experimentation
-│   ├── 01_EDA.ipynb          <- Initial exploratory data analysis
-│   └── 02_Matrix_Sparsity.ipynb <- Prototyping SciPy Sparse logic
+├── notebooks
+│ ├── 01_EDA.ipynb
+│ └── 02_Matrix_Sparsity.ipynb
 │
-├── .dockerignore             <- Prevents heavy data/notebooks from bloating Docker images
-├── .gitignore                <- Standard Git exclusions (ignores actual /data/ content)
-├── LICENSE                   <- MIT or Apache 2.0
-└── README.md                 <- This documentation
+├── .dockerignore
+├── .gitignore
+├── LICENSE
+└── README.md
 
-🧠 Hybrid Engine Logic
-Content-Based: Audio DNA matching via Cosine Similarity.
 
-Collaborative: Community pattern analysis for discovery.
+---
 
-Diversity Slider: A tunable weighted system allowing users to control the recommendation "sweet spot."
+## 🧠 Hybrid Engine Logic
+
+- **🎯 Content-Based Filtering**  
+  Uses audio feature similarity via **Cosine Similarity**
+
+- **👥 Collaborative Filtering**  
+  Learns from user interaction patterns for discovery
+
+- **🎚️ Diversity Slider**  
+  A weighted hybrid system that allows users to tune recommendation balance
+
+---
+
+## ⚙️ Installation
+
+```bash
+git clone https://github.com/your-username/project-name.git
+cd project-name
+
+pip install -r requirements.txt
+
+## ☁️ Deployment Workflow
+- Push code to GitHub
+- GitHub Actions triggers pipeline
+- DVC pulls data from S3
+- Docker image is built and pushed to ECR
+- CodeDeploy updates EC2 instances
+
+## 📈 Key Achievements
+- 🚀 Reduced dataset size from 60GB → 31MB
+- ⚡ Efficient large-scale processing using Dask
+- 📦 Version-controlled ML pipeline with DVC
+- 🔁 Fully automated CI/CD + Deployment
+- 🧠 Hybrid recommendation system with tunable diversity
+
